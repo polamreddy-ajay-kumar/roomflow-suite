@@ -46,7 +46,10 @@ function MyBookings() {
 
   async function cancel(id: string) {
     const { error } = await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Reservation cancelled");
     qc.invalidateQueries({ queryKey: ["my-bookings"] });
   }
