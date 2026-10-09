@@ -11,9 +11,9 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — The Verdant" },
+      { title: "Sign in — A4MP ROOMS" },
       { name: "description", content: "Sign in or create an account to book and manage your stays." },
-      { property: "og:title", content: "Sign in — The Verdant" },
+      { property: "og:title", content: "Sign in — A4MP ROOMS" },
       { property: "og:description", content: "Sign in or create an account to book and manage your stays." },
     ],
   }),

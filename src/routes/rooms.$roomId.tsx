@@ -22,9 +22,9 @@ export const Route = createFileRoute("/rooms/$roomId")({
   }),
   head: () => ({
     meta: [
-      { title: "Book your room — The Verdant" },
+      { title: "Book your room — A4MP ROOMS" },
       { name: "description", content: "Choose your dates and reserve this room instantly." },
-      { property: "og:title", content: "Book your room — The Verdant" },
+      { property: "og:title", content: "Book your room — A4MP ROOMS" },
       { property: "og:description", content: "Choose your dates and reserve this room instantly." },
     ],
   }),

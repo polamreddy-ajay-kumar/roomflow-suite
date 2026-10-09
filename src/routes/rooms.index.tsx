@@ -18,9 +18,9 @@ export const Route = createFileRoute("/rooms/")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Rooms & Suites — The Verdant" },
+      { title: "Rooms & Suites — A4MP ROOMS" },
       { name: "description", content: "Browse rooms and suites with live availability and nightly rates." },
-      { property: "og:title", content: "Rooms & Suites — The Verdant" },
+      { property: "og:title", content: "Rooms & Suites — A4MP ROOMS" },
       { property: "og:description", content: "Browse rooms and suites with live availability and nightly rates." },
     ],
   }),

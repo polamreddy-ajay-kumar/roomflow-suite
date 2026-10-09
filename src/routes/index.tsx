@@ -9,10 +9,10 @@ import { addDays, toISODate } from "@/lib/hotel";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The Verdant — Boutique Hotel, Book Direct" },
-      { name: "description", content: "Check live room availability and book your stay at The Verdant in seconds." },
-      { property: "og:title", content: "The Verdant — Boutique Hotel, Book Direct" },
-      { property: "og:description", content: "Check live room availability and book your stay at The Verdant in seconds." },
+      { title: "A4MP ROOMS — Boutique Hotel, Book Direct" },
+      { name: "description", content: "Check live room availability and book your stay at A4MP ROOMS in seconds." },
+      { property: "og:title", content: "A4MP ROOMS — Boutique Hotel, Book Direct" },
+      { property: "og:description", content: "Check live room availability and book your stay at A4MP ROOMS in seconds." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -30,7 +30,7 @@ function Home() {
   return (
     <main>
       <section className="relative min-h-[88vh] overflow-hidden bg-ink text-ink-foreground">
-        <img src={hero} alt="The Verdant lobby at dusk" width={1600} height={1008} className="absolute inset-0 h-full w-full object-cover" />
+        <img src={hero} alt="A4MP ROOMS lobby at dusk" width={1600} height={1008} className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-veil" />
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end px-4 pb-14">
           <p className="eyebrow mb-4">Boutique hotel · Book direct</p>

@@ -12,9 +12,9 @@ import { formatINR, STATUS_LABEL } from "@/lib/hotel";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Front desk — The Verdant" },
+      { title: "Front desk — A4MP ROOMS" },
       { name: "description", content: "Manage reservations, check-ins and payments." },
-      { property: "og:title", content: "Front desk — The Verdant" },
+      { property: "og:title", content: "Front desk — A4MP ROOMS" },
       { property: "og:description", content: "Manage reservations, check-ins and payments." },
     ],
   }),
