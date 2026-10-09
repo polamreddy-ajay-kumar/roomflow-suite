@@ -38,7 +38,7 @@ function Admin() {
     },
   });
 
-  async function update(id: string, patch: Record<string, string>) {
+  async function update(id: string, patch: BookingUpdate) {
     const { error } = await supabase.from("bookings").update(patch).eq("id", id);
     if (error) toast.error(error.message);
     else qc.invalidateQueries({ queryKey: ["bookings"] });
