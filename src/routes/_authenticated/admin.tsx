@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type BookingUpdate = Database["public"]["Tables"]["bookings"]["Update"];
 import { useAuth } from "@/lib/auth";
 import { useLiveHotelUpdates } from "@/lib/availability";
 import { formatINR, STATUS_LABEL } from "@/lib/hotel";
@@ -35,7 +38,7 @@ function Admin() {
     },
   });
 
-  async function update(id: string, patch: Record<string, string>) {
+  async function update(id: string, patch: BookingUpdate) {
     const { error } = await supabase.from("bookings").update(patch).eq("id", id);
     if (error) toast.error(error.message);
     else qc.invalidateQueries({ queryKey: ["bookings"] });
@@ -61,12 +64,12 @@ function Admin() {
                 <td className="p-3">{b.check_in} → {b.check_out}</td>
                 <td className="p-3">{formatINR(b.total_price)}</td>
                 <td className="p-3">
-                  <select className="rounded border bg-background p-1" value={b.status} onChange={(e) => update(b.id, { status: e.target.value })}>
+                  <select className="rounded border bg-background p-1" value={b.status} onChange={(e) => update(b.id, { status: e.target.value as NonNullable<BookingUpdate["status"]> })}>
                     {Object.entries(STATUS_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </td>
                 <td className="p-3">
-                  <select className="rounded border bg-background p-1" value={b.payment_status} onChange={(e) => update(b.id, { payment_status: e.target.value })}>
+                  <select className="rounded border bg-background p-1" value={b.payment_status} onChange={(e) => update(b.id, { payment_status: e.target.value as NonNullable<BookingUpdate["payment_status"]> })}>
                     <option value="unpaid">Unpaid</option><option value="paid">Paid</option><option value="refunded">Refunded</option>
                   </select>
                 </td>
