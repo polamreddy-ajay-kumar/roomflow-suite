@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type BookingUpdate = Database["public"]["Tables"]["bookings"]["Update"];
 import { useAuth } from "@/lib/auth";
 import { useLiveHotelUpdates } from "@/lib/availability";
 import { formatINR, STATUS_LABEL } from "@/lib/hotel";
