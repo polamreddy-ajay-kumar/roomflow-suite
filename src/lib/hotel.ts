@@ -1,7 +1,16 @@
 import type { Tables } from "@/integrations/supabase/types";
-import standardImg from "@/assets/room-standard.jpg";
-import deluxeImg from "@/assets/room-deluxe.jpg";
-import suiteImg from "@/assets/room-suite.jpg";
+import stdImg from "@/assets/room-std-1.jpg";
+import deluxeImg from "@/assets/room-deluxe-1.jpg";
+import suiteImg from "@/assets/room-suite-1.jpg";
+import twinImg from "@/assets/room-twin-1.jpg";
+import presidentialImg from "@/assets/room-presidential-1.jpg";
+import familyImg from "@/assets/room-family-1.jpg";
+import oceanImg from "@/assets/room-ocean-1.jpg";
+import businessImg from "@/assets/room-business-1.jpg";
+import penthouseImg from "@/assets/room-penthouse-1.jpg";
+import juniorImg from "@/assets/room-junior-1.jpg";
+import heritageImg from "@/assets/room-heritage-1.jpg";
+import studioImg from "@/assets/room-studio-1.jpg";
 
 export type Room = Tables<"rooms">;
 export type Booking = Tables<"bookings">;
@@ -9,12 +18,36 @@ export type Profile = Tables<"profiles">;
 
 export const HOTEL_NAME = "A4MP ROOMS";
 
+const ROOM_IMAGES: Record<string, string> = {
+  studio: studioImg,
+  standard: stdImg,
+  twin: twinImg,
+  business: businessImg,
+  deluxe: deluxeImg,
+  family: familyImg,
+  ocean: oceanImg,
+  junior: juniorImg,
+  heritage: heritageImg,
+  suite: suiteImg,
+  presidential: presidentialImg,
+  penthouse: penthouseImg,
+};
+
 export function roomImage(room: Pick<Room, "image_url" | "room_type">) {
-  if (room.image_url) return room.image_url;
+  if (room.image_url && ROOM_IMAGES[room.image_url]) return ROOM_IMAGES[room.image_url];
   const t = room.room_type.toLowerCase();
+  if (t.includes("penthouse")) return penthouseImg;
+  if (t.includes("presidential")) return presidentialImg;
+  if (t.includes("heritage")) return heritageImg;
+  if (t.includes("junior")) return juniorImg;
   if (t.includes("suite")) return suiteImg;
+  if (t.includes("ocean")) return oceanImg;
+  if (t.includes("family")) return familyImg;
   if (t.includes("deluxe")) return deluxeImg;
-  return standardImg;
+  if (t.includes("business")) return businessImg;
+  if (t.includes("twin")) return twinImg;
+  if (t.includes("studio")) return studioImg;
+  return stdImg;
 }
 
 export function formatINR(n: number | string) {

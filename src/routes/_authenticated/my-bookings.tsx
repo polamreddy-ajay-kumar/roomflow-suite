@@ -15,9 +15,9 @@ import {
 export const Route = createFileRoute("/_authenticated/my-bookings")({
   head: () => ({
     meta: [
-      { title: "My stays — The Verdant" },
+      { title: "My stays — A4MP ROOMS" },
       { name: "description", content: "View and manage your upcoming and past reservations." },
-      { property: "og:title", content: "My stays — The Verdant" },
+      { property: "og:title", content: "My stays — A4MP ROOMS" },
       { property: "og:description", content: "View and manage your upcoming and past reservations." },
     ],
   }),

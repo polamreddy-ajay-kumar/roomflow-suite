@@ -81,8 +81,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "The Verdant — Hotel" },
-      { name: "description", content: "Book rooms at The Verdant with real-time availability." },
+      { title: "A4MP ROOMS — Hotel" },
+      { name: "description", content: "Book rooms at A4MP ROOMS with real-time availability." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
