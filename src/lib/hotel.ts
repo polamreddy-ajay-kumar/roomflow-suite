@@ -7,7 +7,7 @@ export type Room = Tables<"rooms">;
 export type Booking = Tables<"bookings">;
 export type Profile = Tables<"profiles">;
 
-export const HOTEL_NAME = "The Verdant";
+export const HOTEL_NAME = "A4MP ROOMS";
 
 export function roomImage(room: Pick<Room, "image_url" | "room_type">) {
   if (room.image_url) return room.image_url;
