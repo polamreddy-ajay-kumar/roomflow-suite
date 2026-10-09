@@ -64,12 +64,12 @@ function Admin() {
                 <td className="p-3">{b.check_in} → {b.check_out}</td>
                 <td className="p-3">{formatINR(b.total_price)}</td>
                 <td className="p-3">
-                  <select className="rounded border bg-background p-1" value={b.status} onChange={(e) => update(b.id, { status: e.target.value })}>
+                  <select className="rounded border bg-background p-1" value={b.status} onChange={(e) => update(b.id, { status: e.target.value as BookingUpdate["status"] })}>
                     {Object.entries(STATUS_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
                   </select>
                 </td>
                 <td className="p-3">
-                  <select className="rounded border bg-background p-1" value={b.payment_status} onChange={(e) => update(b.id, { payment_status: e.target.value })}>
+                  <select className="rounded border bg-background p-1" value={b.payment_status} onChange={(e) => update(b.id, { payment_status: e.target.value as BookingUpdate["payment_status"] })}>
                     <option value="unpaid">Unpaid</option><option value="paid">Paid</option><option value="refunded">Refunded</option>
                   </select>
                 </td>
