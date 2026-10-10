@@ -83,8 +83,8 @@ function RoomDetail() {
       navigate({ to: "/auth" });
       return;
     }
-    if (!namesOk) return toast.error("Please enter the name of every guest.");
-    if (!phoneOk) return toast.error("Please enter a valid phone number.");
+    if (!namesOk) { toast.error("Please enter the name of every guest."); return; }
+    if (!phoneOk) { toast.error("Please enter a valid phone number."); return; }
     setBusy(true);
     const { error } = await supabase.from("bookings").insert({
       room_id: roomId,

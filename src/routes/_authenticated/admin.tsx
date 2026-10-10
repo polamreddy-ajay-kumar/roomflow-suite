@@ -178,7 +178,7 @@ function MenuEditor() {
   const qc = useQueryClient();
   const [n, setN] = useState({ name: "", category: "Main", price: "", is_veg: true });
   async function add() {
-    if (!n.name.trim() || !Number(n.price)) return toast.error("Enter a name and price");
+    if (!n.name.trim() || !Number(n.price)) { toast.error("Enter a name and price"); return; }
     const { error } = await supabase.from("menu_items").insert({ name: n.name.trim(), category: n.category, price: Number(n.price), is_veg: n.is_veg });
     if (error) toast.error(error.message);
     else { setN({ ...n, name: "", price: "" }); qc.invalidateQueries({ queryKey: ["menu"] }); }
