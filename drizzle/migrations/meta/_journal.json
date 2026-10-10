@@ -15,6 +15,13 @@
       "when": 1791512513699,
       "tag": "0001_seed_100_rooms",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791595969140,
+      "tag": "0002_booking_details_menu",
+      "breakpoints": true
     }
   ]
 }
