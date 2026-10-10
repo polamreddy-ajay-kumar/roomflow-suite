@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { HOTEL_NAME } from "@/lib/hotel";
@@ -9,6 +9,15 @@ export function SiteHeader() {
   const { session, isStaff } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: pending = 0 } = useQuery({
+    queryKey: ["bookings", "pending-count"],
+    enabled: isStaff,
+    refetchInterval: 15000,
+    queryFn: async () => {
+      const { count } = await supabase.from("bookings").select("id", { count: "exact", head: true }).eq("status", "pending");
+      return count ?? 0;
+    },
+  });
 
   async function signOut() {
     await queryClient.cancelQueries();
@@ -34,8 +43,11 @@ export function SiteHeader() {
             </Link>
           )}
           {isStaff && (
-            <Link to="/admin" className={link} activeProps={{ className: "text-foreground" }}>
-              Front desk
+            <Link to="/admin" className={`${link} relative`} activeProps={{ className: "text-foreground" }}>
+              Admin
+              {pending > 0 && (
+                <span className="absolute -right-4 -top-2 rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">{pending}</span>
+              )}
             </Link>
           )}
           {session ? (
