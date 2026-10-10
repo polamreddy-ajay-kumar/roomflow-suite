@@ -39,10 +39,14 @@ function RoomDetail() {
   const [checkOut, setCheckOut] = useState(search.checkOut ?? addDays(checkIn, 1));
   const [guests, setGuests] = useState(search.guests ?? 1);
   const [notes, setNotes] = useState("");
+  const [names, setNames] = useState<string[]>([]);
+  const [phone, setPhone] = useState("");
+  const [qty, setQty] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState(false);
   const { session } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const menu = useMenu();
   useLiveHotelUpdates();
 
   const rooms = useRooms();
@@ -61,13 +65,25 @@ function RoomDetail() {
       </main>
     );
 
+  const guestNames = Array.from({ length: guests }, (_, i) => names[i] ?? "");
+  const namesOk = guestNames.every((n) => n.trim().length > 1);
+  const phoneOk = /^[+0-9 ()-]{8,16}$/.test(phone.trim());
+  const roomTotal = Number(room.price_per_night) * nights;
+  const food = foodTotal(menu.data ?? [], qty);
+  const grand = roomTotal + food;
   const blocked = !validRange || taken || room.status !== "available" || guests > room.capacity;
+
+  function setQ(id: string, d: number) {
+    setQty((q) => ({ ...q, [id]: Math.max(0, Math.min(50, (q[id] ?? 0) + d)) }));
+  }
 
   async function book() {
     if (!session) {
       navigate({ to: "/auth" });
       return;
     }
+    if (!namesOk) return toast.error("Please enter the name of every guest.");
+    if (!phoneOk) return toast.error("Please enter a valid phone number.");
     setBusy(true);
     const { error } = await supabase.from("bookings").insert({
       room_id: roomId,
@@ -75,6 +91,9 @@ function RoomDetail() {
       check_in: checkIn,
       check_out: checkOut,
       guests,
+      guest_names: guestNames.map((n) => n.trim()),
+      contact_phone: phone.trim(),
+      food_items: Object.entries(qty).filter(([, n]) => n > 0).map(([id, n]) => ({ id, qty: n })),
       special_requests: notes || null,
     });
     setBusy(false);
@@ -83,7 +102,7 @@ function RoomDetail() {
       qc.invalidateQueries({ queryKey: ["booked"] });
       return;
     }
-    toast.success("Reservation confirmed!");
+    toast.success("Booking request sent! The hotel will confirm shortly.");
     navigate({ to: "/my-bookings" });
   }
 
