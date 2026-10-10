@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useBookedRanges, useLiveHotelUpdates, useRooms } from "@/lib/availability";
+import { foodTotal, useMenu } from "@/lib/menu";
 import { addDays, formatINR, friendlyDbError, nightsBetween, rangesOverlap, roomImage, toISODate } from "@/lib/hotel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,10 +40,14 @@ function RoomDetail() {
   const [checkOut, setCheckOut] = useState(search.checkOut ?? addDays(checkIn, 1));
   const [guests, setGuests] = useState(search.guests ?? 1);
   const [notes, setNotes] = useState("");
+  const [names, setNames] = useState<string[]>([]);
+  const [phone, setPhone] = useState("");
+  const [qty, setQty] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState(false);
   const { session } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const menu = useMenu();
   useLiveHotelUpdates();
 
   const rooms = useRooms();
@@ -61,13 +66,25 @@ function RoomDetail() {
       </main>
     );
 
+  const guestNames = Array.from({ length: guests }, (_, i) => names[i] ?? "");
+  const namesOk = guestNames.every((n) => n.trim().length > 1);
+  const phoneOk = /^[+0-9 ()-]{8,16}$/.test(phone.trim());
+  const roomTotal = Number(room.price_per_night) * nights;
+  const food = foodTotal(menu.data ?? [], qty);
+  const grand = roomTotal + food;
   const blocked = !validRange || taken || room.status !== "available" || guests > room.capacity;
+
+  function setQ(id: string, d: number) {
+    setQty((q) => ({ ...q, [id]: Math.max(0, Math.min(50, (q[id] ?? 0) + d)) }));
+  }
 
   async function book() {
     if (!session) {
       navigate({ to: "/auth" });
       return;
     }
+    if (!namesOk) { toast.error("Please enter the name of every guest."); return; }
+    if (!phoneOk) { toast.error("Please enter a valid phone number."); return; }
     setBusy(true);
     const { error } = await supabase.from("bookings").insert({
       room_id: roomId,
@@ -75,6 +92,9 @@ function RoomDetail() {
       check_in: checkIn,
       check_out: checkOut,
       guests,
+      guest_names: guestNames.map((n) => n.trim()),
+      contact_phone: phone.trim(),
+      food_items: Object.entries(qty).filter(([, n]) => n > 0).map(([id, n]) => ({ id, qty: n })),
       special_requests: notes || null,
     });
     setBusy(false);
@@ -83,7 +103,7 @@ function RoomDetail() {
       qc.invalidateQueries({ queryKey: ["booked"] });
       return;
     }
-    toast.success("Reservation confirmed!");
+    toast.success("Booking request sent! The hotel will confirm shortly.");
     navigate({ to: "/my-bookings" });
   }
 
@@ -116,21 +136,59 @@ function RoomDetail() {
         </div>
         <div className="mt-3 grid gap-1.5">
           <Label htmlFor="g">Guests (max {room.capacity})</Label>
-          <Input id="g" type="number" min={1} max={room.capacity} value={guests} onChange={(e) => setGuests(Number(e.target.value) || 1)} />
+          <Input id="g" type="number" min={1} max={room.capacity} value={guests} onChange={(e) => setGuests(Math.max(1, Math.min(room.capacity, Number(e.target.value) || 1)))} />
+        </div>
+        <div className="mt-3 grid gap-2">
+          <Label>Names of guests staying</Label>
+          {guestNames.map((n, i) => (
+            <Input key={i} value={n} maxLength={80} placeholder={`Guest ${i + 1} full name`} onChange={(e) => {
+              const next = [...guestNames];
+              next[i] = e.target.value;
+              setNames(next);
+            }} />
+          ))}
+        </div>
+        <div className="mt-3 grid gap-1.5">
+          <Label htmlFor="ph">Contact phone number</Label>
+          <Input id="ph" type="tel" value={phone} maxLength={16} placeholder="+91 98765 43210" onChange={(e) => setPhone(e.target.value)} />
+        </div>
+        <div className="mt-5">
+          <Label>Add food (optional)</Label>
+          <div className="mt-2 max-h-72 space-y-3 overflow-y-auto rounded-md border p-3">
+            {Array.from(new Set((menu.data ?? []).filter((m) => m.available).map((m) => m.category))).map((cat) => (
+              <div key={cat}>
+                <p className="eyebrow mb-1">{cat}</p>
+                {(menu.data ?? []).filter((m) => m.available && m.category === cat).map((m) => (
+                  <div key={m.id} className="flex items-center justify-between gap-2 py-1 text-sm">
+                    <div className="min-w-0">
+                      <p className="truncate">{m.is_veg ? "🟢" : "🔴"} {m.name}</p>
+                      <p className="text-xs text-muted-foreground">{formatINR(m.price)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button type="button" size="sm" variant="outline" className="h-7 w-7 p-0" onClick={() => setQ(m.id, -1)}>−</Button>
+                      <span className="w-5 text-center">{qty[m.id] ?? 0}</span>
+                      <Button type="button" size="sm" variant="outline" className="h-7 w-7 p-0" onClick={() => setQ(m.id, 1)}>+</Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
         <div className="mt-3 grid gap-1.5">
           <Label htmlFor="n">Special requests</Label>
           <Textarea id="n" value={notes} maxLength={500} onChange={(e) => setNotes(e.target.value)} placeholder="Late arrival, extra pillows…" />
         </div>
         <div className="mt-6 space-y-1 border-t pt-4 text-sm">
-          <div className="flex justify-between"><span>{formatINR(room.price_per_night)} × {nights} night{nights === 1 ? "" : "s"}</span><span>{formatINR(Number(room.price_per_night) * nights)}</span></div>
-          <div className="flex justify-between text-base font-semibold"><span>Total</span><span>{formatINR(Number(room.price_per_night) * nights)}</span></div>
-          <p className="text-xs text-muted-foreground">Pay at the hotel on arrival.</p>
+          <div className="flex justify-between"><span>{formatINR(room.price_per_night)} × {nights} night{nights === 1 ? "" : "s"}</span><span>{formatINR(roomTotal)}</span></div>
+          {food > 0 && <div className="flex justify-between"><span>Food</span><span>{formatINR(food)}</span></div>}
+          <div className="flex justify-between text-base font-semibold"><span>Total</span><span>{formatINR(grand)}</span></div>
+          <p className="text-xs text-muted-foreground">Your request goes to the hotel for confirmation. Pay at the hotel or as instructed.</p>
         </div>
         {taken && <p className="mt-4 text-sm text-destructive">Already booked for these dates — try different dates.</p>}
         {room.status !== "available" && <p className="mt-4 text-sm text-destructive">This room is temporarily closed.</p>}
         <Button className="mt-6 w-full" variant="brass" size="lg" disabled={blocked || busy} onClick={book}>
-          {busy ? "Reserving…" : session ? "Reserve now" : "Sign in to reserve"}
+          {busy ? "Sending…" : session ? `Book now · ${formatINR(grand)}` : "Sign in to reserve"}
         </Button>
       </aside>
     </main>

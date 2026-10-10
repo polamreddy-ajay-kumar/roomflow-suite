@@ -22,16 +22,19 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const [mode, setMode] = useState<"in" | "up">("in");
+  const [who, setWho] = useState<"guest" | "admin">("guest");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
-  const { session } = useAuth();
+  const { session, isStaff, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (session) navigate({ to: "/my-bookings", replace: true });
-  }, [session, navigate]);
+    if (!session || loading) return;
+    if (who === "admin" && !isStaff) toast.error("This account does not have admin access.");
+    navigate({ to: isStaff ? "/admin" : "/my-bookings", replace: true });
+  }, [session, loading, isStaff, who, navigate]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,8 +61,12 @@ function AuthPage() {
 
   return (
     <main className="mx-auto max-w-md px-4 py-20">
-      <p className="eyebrow">Welcome</p>
-      <h1 className="mt-2 text-5xl text-primary">{mode === "in" ? "Sign in" : "Create account"}</h1>
+      <div className="mb-8 grid grid-cols-2 gap-2 rounded-md border p-1">
+        <Button variant={who === "guest" ? "default" : "ghost"} onClick={() => setWho("guest")}>Guest login</Button>
+        <Button variant={who === "admin" ? "default" : "ghost"} onClick={() => { setWho("admin"); setMode("in"); }}>Admin login</Button>
+      </div>
+      <p className="eyebrow">{who === "admin" ? "Hotel staff" : "Welcome"}</p>
+      <h1 className="mt-2 text-5xl text-primary">{who === "admin" ? "Admin sign in" : mode === "in" ? "Sign in" : "Create account"}</h1>
       <Button variant="outline" className="mt-8 w-full" onClick={google}>Continue with Google</Button>
       <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground"><div className="h-px flex-1 bg-border" />or<div className="h-px flex-1 bg-border" /></div>
       <form onSubmit={submit} className="grid gap-4">
@@ -79,9 +86,11 @@ function AuthPage() {
         </div>
         <Button type="submit" disabled={busy}>{busy ? "Please wait…" : mode === "in" ? "Sign in" : "Create account"}</Button>
       </form>
-      <button className="mt-6 text-sm text-muted-foreground underline" onClick={() => setMode(mode === "in" ? "up" : "in")}>
-        {mode === "in" ? "New here? Create an account" : "Already have an account? Sign in"}
-      </button>
+      {who === "guest" && (
+        <button className="mt-6 text-sm text-muted-foreground underline" onClick={() => setMode(mode === "in" ? "up" : "in")}>
+          {mode === "in" ? "New here? Create an account" : "Already have an account? Sign in"}
+        </button>
+      )}
     </main>
   );
 }

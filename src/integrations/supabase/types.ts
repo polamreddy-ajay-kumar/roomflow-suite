@@ -16,9 +16,14 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          admin_seen: boolean
           check_in: string
           check_out: string
+          contact_phone: string | null
           created_at: string
+          food_items: Json
+          food_total: number
+          guest_names: string[]
           guests: number
           id: string
           payment_status: Database["public"]["Enums"]["payment_status"]
@@ -29,9 +34,14 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          admin_seen?: boolean
           check_in: string
           check_out: string
+          contact_phone?: string | null
           created_at?: string
+          food_items?: Json
+          food_total?: number
+          guest_names?: string[]
           guests?: number
           id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -42,9 +52,14 @@ export type Database = {
           user_id: string
         }
         Update: {
+          admin_seen?: boolean
           check_in?: string
           check_out?: string
+          contact_phone?: string | null
           created_at?: string
+          food_items?: Json
+          food_total?: number
+          guest_names?: string[]
           guests?: number
           id?: string
           payment_status?: Database["public"]["Enums"]["payment_status"]
@@ -70,6 +85,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      menu_items: {
+        Row: {
+          available: boolean
+          category: string
+          created_at: string
+          description: string
+          id: string
+          is_veg: boolean
+          name: string
+          price: number
+        }
+        Insert: {
+          available?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_veg?: boolean
+          name: string
+          price?: number
+        }
+        Update: {
+          available?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_veg?: boolean
+          name?: string
+          price?: number
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
